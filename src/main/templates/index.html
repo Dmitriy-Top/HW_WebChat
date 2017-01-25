@@ -1,0 +1,60 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <meta http-equiv="refresh" content="10; URL=./">
+    <title>HW_WebCalc</title>
+</head>
+<body>
+<div id="container">
+    <div id="msg_history_div">
+        <ul>
+            ${messages}
+        </ul>
+    </div>
+    <form action="./" method="post">
+        <label for="nick">Ник пользователя</label>
+        <input id="nick" required value="${nick}" type="text" name="nick" maxlength="50">
+        <label for="msg">Сообщение</label>
+        <textarea id="msg" required rows="5" type="textarea" name="msg" maxlength="200"></textarea>
+        <input type="submit" value="Отправить">
+    </form>
+</div>
+<style>
+    #container{
+        font-family: 'Roboto', sans-serif;
+        font-size:16px;
+        padding: 8px;
+        border: 1px solid #dfdfdf;
+        color: #3f3f3f;
+        width: 360px;
+        margin: 150px auto;
+    }
+    #msg_history_div{
+        height: 160px;
+        overflow: auto;
+        border: 1px solid #dfdfdf;
+    }
+    #msg_history_div ul{
+        list-style: none;
+        margin: 8px;
+        padding: 0;
+    }
+    #container form{
+        margin: 8px 0 8px 0;
+    }
+    input, textarea {
+        width: 100%;
+    }
+    label {
+        padding-bottom:4px;
+        padding-top:4px;
+        display: block;
+    }
+    input[type="submit"]{
+        margin-top:8px;
+    }
+</style>
+</body>
+</html>
