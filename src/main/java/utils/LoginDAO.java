@@ -1,52 +1,38 @@
 package main.java.utils;
 
-import javax.naming.InitialContext;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Created by admin on 30.01.2017.
  */
 public class LoginDAO {
-    private static DataSource ds = null;
-    private static Connection con = null;
-    private static Statement stmt = null;
-    private static InitialContext ic;
-
 
     public static boolean isAuthenticated(String jsessionid) {
         boolean isAuth = false;
         if (jsessionid == null) return false;
         try {
-            ic = new InitialContext();
-            ds = (DataSource) ic.lookup("java:/PostgresDS");
-            con = ds.getConnection();
-            stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from sessions");
+            Statement stmt = DBHelper.getInstanceConnection().createStatement();
+            ResultSet rs = stmt.executeQuery("select * from users");
             while (rs.next()) {
-                if (rs.getString("session").equals(jsessionid)) {
+                String sessions = rs.getString("session");
+                if (sessions!=null&&sessions.equals(jsessionid)) {
                     isAuth = true;
                     break;
                 }
             }
             rs.close();
             stmt.close();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-
 
         return isAuth;
     }
@@ -56,10 +42,7 @@ public class LoginDAO {
         if (login == null | pass == null) return false;
         String md5hash = MD5hash(pass);
         try {
-            ic = new InitialContext();
-            ds = (DataSource) ic.lookup("java:/PostgresDS");
-            con = ds.getConnection();
-            stmt = con.createStatement();
+            Statement stmt = DBHelper.getInstanceConnection().createStatement();
             ResultSet rs = stmt.executeQuery("select * from users");
             while (rs.next()) {
                 if (rs.getString("user").equals(login) && rs.getString("pass").equals(md5hash)) {
@@ -67,21 +50,15 @@ public class LoginDAO {
                     break;
                 }
             }
+            rs.close();
+            stmt.close();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return isAuth;
     }
 
-    public static void addAuthSession(HttpServletRequest req) {
+    public static void addAuthSession(HttpServletRequest req, String pass) {
         String jsessionid=null;
         Cookie[] cookies = req.getCookies();
         if (cookies!=null)for (Cookie cookie:cookies){
@@ -92,24 +69,15 @@ public class LoginDAO {
         }
         if (jsessionid!=null){
             try {
-                ic = new InitialContext();
-                ds = (DataSource) ic.lookup("java:/PostgresDS");
-                con = ds.getConnection();
-                PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO sessions (session) values(?)");
+                PreparedStatement preparedStatement = DBHelper.getInstanceConnection().prepareStatement("UPDATE users SET session = ? WHERE pass = ?");
                 preparedStatement.setString(1,jsessionid);
-                preparedStatement.executeUpdate();
+                preparedStatement.setString(2,MD5hash(pass));
+                int i = preparedStatement.executeUpdate();
+                System.out.println(i + "change row"+" pass is "+pass);
                 preparedStatement.close();
-                stmt.close();
+                DBHelper.getInstanceConnection().close();
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                if (con != null) {
-                    try {
-                        con.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         }
 

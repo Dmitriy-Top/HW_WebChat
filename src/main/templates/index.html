@@ -3,15 +3,13 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <meta http-equiv="refresh" content="10; URL=./">
     <title>HW_WebCalc</title>
 </head>
 <body>
 <div id="container">
     <div id="msg_history_div">
-        <ul>
-            ${messages}
-        </ul>
+        <iframe src="chatlog">Ваш браузер не поддерживает фреймы!
+        </iframe>
     </div>
     <form action="./" method="post">
         <label for="nick">Ник пользователя</label>
@@ -36,11 +34,6 @@
         overflow: auto;
         border: 1px solid #dfdfdf;
     }
-    #msg_history_div ul{
-        list-style: none;
-        margin: 8px;
-        padding: 0;
-    }
     #container form{
         margin: 8px 0 8px 0;
     }
@@ -54,6 +47,10 @@
     }
     input[type="submit"]{
         margin-top:8px;
+    }
+    iframe {
+        border: none;
+        width: 100%;
     }
 </style>
 </body>
